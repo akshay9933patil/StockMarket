@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title_stock_market %}
+<title>Stocks</title>
+ {% endblock %}
+
+{% block stock_market %}
+    
+    <div id="data-container">
+        <h1>Stocks</h1>
+
+<table class="table table-dark text-center mt-5 shadow" id="stock-table">
+    <thead class="table-info">
+        <tr>
+            <th>Stock Name</th>
+            <th>Current Value</th>
+            <th>Last Update</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in stocks %}
+            <tr>
+                <td>{{ stock.companyName }}</td>
+                <td>{{ stock.currentValue }}</td>
+                <td>{{ stock.updatedOn }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button id="update-button">Update Data</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Function to update stock data
+        function updateStockData() {
+            $.ajax({
+                url: '/stocks/astocks/',  // URL mapped to the Django view that updates the stock data
+                type: 'GET',
+                success: function(data) {
+                    // Update the table with the updated stock data
+                    console.log('data:---->', data)
+                    console.log('data is updating started---->')
+                    var tableBody = '';
+                    data.stocks.forEach(function(stock) {
+                        tableBody += '<tr>' +
+                            '<td>' + stock.companyName + '</td>' +
+                            '<td>' + stock.currentValue + '</td>' +
+                            '<td>' + stock.updatedOn + '</td>' +
+                            '</tr>';
+                            console.log('data is updating ended---->')
+                        });
+                    $('#stock-table tbody').html(tableBody);
+                },
+                error: function() {
+                    console.log('Error occurred during the AJAX request.');
+                }
+            });
+        }
+    
+        // Fetch stock data initially
+        updateStockData();
+    
+        // Fetch stock data every 5 seconds
+        setInterval(function() {
+            updateStockData();
+        }, 10000);
+    });
+    </script>
+    </div>
+    
+ {% endblock %}
